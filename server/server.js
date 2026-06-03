@@ -19,6 +19,19 @@ const db= new pg.Client({
 
 db.connect();
 
+app.get("/api/dataCount",async(req,res)=>{
+    try{
+        const totalStores=await db.query("SELECT COUNT(*) FROM store");
+        const totalUsers=await db.query("SELECT COUNT(*) FROM users");
+        const totalRatings=await db.query("SELECT COUNT(*) FROM ratings");
+        res.status(200).json({totalStores: totalStores.rows[0].count, totalUsers: totalUsers.rows[0].count, totalRatings: totalRatings.rows[0].count});
+        console.log(totalStores.rows[0].count, totalUsers.rows[0].count, totalRatings.rows[0].count);
+    }catch(error){
+        console.error("Error fetching data count:", error);
+        res.status(500).json({error:"Failed to fetch data count"});
+    }
+})
+
 app.post("/api/addStore", async(req,res)=>{
     const {storeName, storeLocation, storeOwner} = req.body;
     console.log(storeName, storeLocation, storeOwner);
@@ -42,6 +55,28 @@ app.post("/api/addUser",async(req,res)=>{
         res.status(500).json({error:"Failed to add user"});
     }
 })
+
+app.get("/api/viewUsers", async(req,res)=>{
+    try{
+        const result=await db.query("SELECT *FROM users");
+        const users=result.rows;
+        res.status(200).json(users);
+    }catch(error){
+        console.error("Error fetching users:", error);
+        res.status(500).json({error:"Failed to fetch users"});
+    }
+});
+
+app.get("/api/viewStore", async(req,res)=>{
+    try{
+        const result =await db.query("SELECT * FROM store");
+        const stores = result.rows;
+        res.status(200).json(stores);
+    }catch(error){
+        console.error("Error fetching stores:", error);
+        res.status(500).json({error:"Failed to fetch stores"});
+    }
+});
 
 app.listen(port,()=>{
     console.log(`Server is running on port ${port}`);
