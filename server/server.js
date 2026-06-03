@@ -25,10 +25,23 @@ app.get("/api/dataCount",async(req,res)=>{
         const totalUsers=await db.query("SELECT COUNT(*) FROM users");
         const totalRatings=await db.query("SELECT COUNT(*) FROM ratings");
         res.status(200).json({totalStores: totalStores.rows[0].count, totalUsers: totalUsers.rows[0].count, totalRatings: totalRatings.rows[0].count});
-        console.log(totalStores.rows[0].count, totalUsers.rows[0].count, totalRatings.rows[0].count);
+        
     }catch(error){
         console.error("Error fetching data count:", error);
         res.status(500).json({error:"Failed to fetch data count"});
+    }
+})
+app.get("/api/storeOwners", async(req,res)=>{
+    try{
+        const result = await db.query("SELECT user_id, name FROM users WHERE role='store_owner' AND user_id NOT IN(SELECT owner_id FROM store);");
+        const storeOwners = result.rows;
+        console.log(result.rows);
+        res.status(200).json(storeOwners);
+        
+        
+    }catch(error){
+        console.error("Error fetching store owners:", error);
+        res.status(500).json({error:"Failed to fetch store owners"});
     }
 })
 
