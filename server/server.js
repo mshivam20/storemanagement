@@ -31,6 +31,17 @@ app.post("/api/addStore", async(req,res)=>{
     }
 })
 
+app.post("/api/addUser",async(req,res)=>{
+    const {userName, userEmail, userPassword, userRole, address} = req.body;
+    console.log(userName, userEmail, userPassword, userRole, address);
+    try{
+        await db.query("INSERT INTO users (name, email, password, address, role) VALUES ($1, $2, $3, $4, $5)",[userName, userEmail, userPassword, address, userRole]);
+        res.status(200).json({message:"User added successfully"});  
+    }catch(error){
+        console.error("Error adding user:", error);
+        res.status(500).json({error:"Failed to add user"});
+    }
+})
 
 app.listen(port,()=>{
     console.log(`Server is running on port ${port}`);

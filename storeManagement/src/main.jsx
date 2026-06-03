@@ -10,6 +10,8 @@ import './index.css'
 import Login from './login';
 import AdminDashboard from './adminDashboard';
 import UserPanel from './userPanel';
+import AddUser from './addUser';
+
 
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -19,6 +21,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <Route path="/" element={<Login />} />
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/user" element={<UserPanel />} />
+      <Route path="/addUser" element={<AddUser />} />
     </Routes>
   </BrowserRouter>,
 )

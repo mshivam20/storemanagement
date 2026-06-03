@@ -1,11 +1,12 @@
 import React from "react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function AddStore(){
     const [storeName, setStoreName] = useState("");
     const [storeLocation, setStoreLocation] = useState("");
     const [storeOwner, setStoreOwner] = useState("");
-
+    const navigate = useNavigate();
 
    const addStore = async () =>{
          const response =await fetch("/api/addStore",{
@@ -21,7 +22,10 @@ function AddStore(){
         } )
             const data = await response.json();
             console.log(data);
+            navigate("/addStore");
+            
    };
+
   
 
     
