@@ -21,7 +21,7 @@ const db= new pg.Client({
    password: process.env.DB_PASSWORD,
    port: process.env.DB_PORT
 });
-const saltRound=10;
+const saltRound=process.env.SALTROUND;
 
 db.connect();
 app.post("/api/signup", async(req,res)=>{
@@ -274,6 +274,57 @@ res.status(200).json({
       });
     }
 })
+
+app.put("/api/changePassword", async (req, res) => {
+  try {
+    console.log("ROUTE HIT");
+    const { email, currentPassword, newPassword } = req.body;
+
+    console.log(req.body);
+    const response = await db.query(
+      "SELECT * FROM users WHERE email = $1",
+      [email]
+    );
+
+    const result = response.rows;
+
+    if (result.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "User not found" });
+    }
+
+    const user = result[0];
+
+    const isMatch = await bcrypt.compare(
+      currentPassword,
+      user.password
+    );
+
+    if (!isMatch) {
+      return res
+        .status(400)
+        .json({ message: "Invalid current password" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await db.query(
+      "UPDATE users SET password = $1 WHERE email = $2",
+      [hashedPassword, email]
+    );
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Password updated successfully" });
+
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "Server error" });
+  }
+});
 
 app.listen(process.env.PORT,()=>{
     console.log(`Server is running on port ${process.env.PORT}`);
