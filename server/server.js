@@ -61,7 +61,7 @@ app.post ("/api/login", async (req,res)=>{
         }else{
             const user = result.rows[0];
             console.log(user);
-            console.log(user.id);
+           
             console.log(user.user_id);
             bcrypt.compare(password, user.password, (err,isMatch)=>{
                 if(err){
@@ -71,6 +71,7 @@ app.post ("/api/login", async (req,res)=>{
                     const token = jwt.sign(
                         {
                             id: user.user_id,
+                            name:user.name,
                             email: user.email,
                             role: user.role,
                         },
@@ -162,13 +163,13 @@ app.get("/api/viewStore", async(req,res)=>{
         res.status(500).json({error:"Failed to fetch stores"});
     }
 });
-app.get(
-  "/api/admin",
-  verifyToken,
-  (req, res) => {
-    res.json(products);
-  }
-);
+// app.get(
+//   "/api/admin",
+//   verifyToken,
+//   (req, res) => {
+//     res.json(products);
+//   }
+// );
 
 app.get("/api/getStores", verifyToken, async (req, res) => {
   const userId = req.user.id;
@@ -239,7 +240,40 @@ app.post(
     }
   }
 );
-app.get("/api/")
+app.get("/api/store-owner/dashboard",verifyToken, async(req,res)=>{
+    const user_id= req.user.id;
+    console.log(user_id);
+    try{
+        const storeData= await db.query(`SELECT store.store_id, store.store_name,store.address,store.overall_rating,users.name
+FROM store
+JOIN users
+ON store.owner_id= users.user_id
+WHERE store.owner_id=$1`,[user_id]);
+
+
+
+const ratingsHistory = await db.query(`
+    SELECT users.name,users.email , ratings.rating 
+FROM ratings
+JOIN users
+ON users.user_id= ratings.user_id
+WHERE store_id=$1
+`,[storeData.rows[0].store_id]);
+
+console.log(storeData.rows);
+console.log(ratingsHistory.rows)
+res.status(200).json({
+  storeData: storeData.rows,
+  ratingsHistory: ratingsHistory.rows,
+});
+
+    }catch(error){
+        console.error(error)
+        res.status(500).json({
+        message: "Server Error",
+      });
+    }
+})
 
 app.listen(process.env.PORT,()=>{
     console.log(`Server is running on port ${process.env.PORT}`);

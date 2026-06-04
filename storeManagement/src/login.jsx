@@ -65,14 +65,7 @@ export default function Login() {
 
     const token = localStorage.getItem("token");
 
-const response = await fetch(
-  "/api/admin",
-  {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }
-);  
+
 
   };
 

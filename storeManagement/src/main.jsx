@@ -58,7 +58,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <Route
       path="/store-owner"
       element={
-        <ProtectedRoute allowedRole="store-owner">
+        <ProtectedRoute allowedRole="store_owner">
           <OwnerPanel />
         </ProtectedRoute>
       }
