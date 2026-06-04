@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import pg from 'pg';
 import dotenv from 'dotenv';
 import jwt from "jsonwebtoken";
+import verifyToken from './middleware/auth.js';
 
 dotenv.config();
 
@@ -59,6 +60,9 @@ app.post ("/api/login", async (req,res)=>{
             return res.status(400).json({message:"Invalid email or password"});
         }else{
             const user = result.rows[0];
+            console.log(user);
+            console.log(user.id);
+            console.log(user.user_id);
             bcrypt.compare(password, user.password, (err,isMatch)=>{
                 if(err){
                     console.error("Error comparing passwords:", err);
@@ -66,7 +70,7 @@ app.post ("/api/login", async (req,res)=>{
                 }else if(isMatch){
                     const token = jwt.sign(
                         {
-                            id: user.id,
+                            id: user.user_id,
                             email: user.email,
                             role: user.role,
                         },
@@ -158,6 +162,84 @@ app.get("/api/viewStore", async(req,res)=>{
         res.status(500).json({error:"Failed to fetch stores"});
     }
 });
+app.get(
+  "/api/admin",
+  verifyToken,
+  (req, res) => {
+    res.json(products);
+  }
+);
+
+app.get("/api/getStores", verifyToken, async (req, res) => {
+  const userId = req.user.id;
+  console.log(userId)
+  
+
+  const result = await db.query(
+    `
+    SELECT
+      s.store_id,
+      s.store_name,
+      s.address,
+
+      COALESCE(AVG(r.rating),0) AS overall_rating,
+
+      (
+        SELECT rating
+        FROM ratings
+        WHERE store_id = s.store_id
+        AND user_id = $1
+      ) AS user_rating
+
+    FROM store s
+    LEFT JOIN ratings r
+      ON s.store_id = r.store_id
+
+    GROUP BY s.store_id
+    `,
+    [userId]
+  );
+  console.log(result.rows);
+
+  res.json(result.rows);
+});
+app.post(
+  "/api/userRating/:id/rating",
+  verifyToken,
+  async (req, res) => {
+    const storeId = req.params.id;
+    const userId = req.user.id;
+    console.log(userId);
+    const { rating } = req.body;
+
+    try {
+      await db.query(
+        `
+        INSERT INTO ratings
+        (user_id, store_id, rating)
+        VALUES ($1, $2, $3)
+
+        ON CONFLICT (user_id, store_id)
+        DO UPDATE
+        SET rating = EXCLUDED.rating
+        `,
+        [userId, storeId, rating]
+      );
+
+      res.status(200).json({
+        success: true,
+        message: "Rating saved",
+      });
+    } catch (error) {
+      console.error(error);
+
+      res.status(500).json({
+        message: "Server Error",
+      });
+    }
+  }
+);
+app.get("/api/")
 
 app.listen(process.env.PORT,()=>{
     console.log(`Server is running on port ${process.env.PORT}`);

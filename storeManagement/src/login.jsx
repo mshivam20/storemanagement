@@ -43,6 +43,8 @@ export default function Login() {
       if (response.ok) {
         // Store JWT
          
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("role", data.role);
 
         // Redirect to dashboard
         if (data.role === "admin") {
@@ -60,6 +62,18 @@ export default function Login() {
     } catch (err) {
       setError("Something went wrong");
     }
+
+    const token = localStorage.getItem("token");
+
+const response = await fetch(
+  "/api/admin",
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);  
+
   };
 
   return (
