@@ -15,6 +15,7 @@ import Signup from './signup';
 import OwnerPanel from './ownerPanel';
 import ProtectedRoute from './protectedRoute';
 import HomeRedirect from './homeRedirect';
+import ChangePassword from './changePassword';
 
 
 
@@ -72,6 +73,13 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         </ProtectedRoute>
       }
     />
+    <Route 
+      path='/change-password'
+      element={
+        <ChangePassword />
+      } />
+
+      
 
   </Routes>
 </BrowserRouter>,

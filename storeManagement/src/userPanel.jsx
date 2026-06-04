@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 
 import { useNavigate } from "react-router-dom";
-import { Search, Star, LogOut } from "lucide-react";
+import { Search, Star, LogOut,KeyRound } from "lucide-react";
+
+
+
 export default function UserPanel() {
     
   const navigate = useNavigate();
@@ -111,8 +114,25 @@ const handleRating = async (storeId, rating) => {
           Logout
         </button>
       </div>
+        
+         <div className="bg-white rounded-xl shadow-md p-6 mb-6 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <KeyRound size={22} />
+            <h2 className="text-xl font-bold">
+              Change Password
+            </h2>
+          </div>
 
-      <div className="max-w-6xl mx-auto p-6">
+          <button
+            onClick={() => navigate("/change-password")}
+            className="bg-slate-900 text-white px-5 py-2 rounded-lg hover:bg-slate-700"
+          >
+            Go to Change Password
+          </button>
+        </div>
+        
+
+    
 
         {/* Search */}
         <div className="bg-white rounded-xl shadow-md p-4 mb-6">
@@ -211,6 +231,7 @@ const handleRating = async (storeId, rating) => {
         </div>
 
       </div>
-    </div>
+     
+   
   )
 }
