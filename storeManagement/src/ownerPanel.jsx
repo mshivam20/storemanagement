@@ -1,15 +1,13 @@
 import React from "react";
 
-
-function UserPanel(){
+function OwnerPanel(){
     return(
         <div>
-            <div className="user-panel">
+            <div className="owner-panel">
                 <div className="header"></div>
-            </div>
-
+            </div>  
         </div>
     )
 }
 
-export default UserPanel;
+export default OwnerPanel;

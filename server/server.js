@@ -1,23 +1,91 @@
 import express from 'express';
 import cors from 'cors';
-
+import bcrypt from 'bcrypt';
 import pg from 'pg';
+import dotenv from 'dotenv';
+import jwt from "jsonwebtoken";
+
+dotenv.config();
 
 const app = express();
-const port=3000;
+
 
 app.use(cors());
 app.use(express.json());
 
 const db= new pg.Client({
-    user:"postgres",
-    host:"localhost",
-    database:"storeManagement",
-    password:"isbm@123",
-    port:5432
+   user: process.env.DB_USER,
+   host: process.env.DB_HOST,
+   database: process.env.DB_NAME,
+   password: process.env.DB_PASSWORD,
+   port: process.env.DB_PORT
 });
+const saltRound=10;
 
 db.connect();
+app.post("/api/signup", async(req,res)=>{
+    const {name, email, password, address, role} = req.body;
+    
+    try{
+        const checkResult= await db.query("SELECT * FROM users WHERE email=$1",[email]);
+        if(checkResult.length>0){
+            return res.status(400).json({message:"Email already exists"});
+
+        }else{
+            bcrypt.hash(password, saltRound, async(err, hash)=>{
+                if(err){
+                    console.error("Error hashing password:", err);
+                    return res.status(500).json({message:"Internal server error"});
+                }else{
+                    await db.query("INSERT INTO users (name, email, password, address, role) VALUES ($1, $2, $3, $4, $5)",[name, email, hash, address, role   ]);
+                    res.status(200).json({success:"true", message:"User created successfully"});
+                }
+                
+            })
+        }
+    }catch(error){
+        console.error("Error during signup:", error);
+        res.status(500).json({message:"Internal server error"});
+    }
+})
+
+app.post ("/api/login", async (req,res)=>{
+    const {email, password} = req.body;
+    console.log(email, password);
+    try{
+        const result =await db.query("SELECT * FROM users WHERE email=$1",[email]);
+        console.log(result.rows);
+        if(result.rows.length===0){
+            return res.status(400).json({message:"Invalid email or password"});
+        }else{
+            const user = result.rows[0];
+            bcrypt.compare(password, user.password, (err,isMatch)=>{
+                if(err){
+                    console.error("Error comparing passwords:", err);
+                    return res.status(500).json({message:"Internal server error"});
+                }else if(isMatch){
+                    const token = jwt.sign(
+                        {
+                            id: user.id,
+                            email: user.email,
+                            role: user.role,
+                        },
+                            process.env.JWT_SECRET,
+                {
+                    expiresIn: "1d",
+                }
+        );
+                    res.status(200).json({success:"true", message:"Login successful", role: user.role, token});
+                }else{
+                    res.status(400).json({message:"Invalid email or password"});
+                }
+            })
+        }
+    }catch(error){
+        console.error("Error during login:", error);
+        res.status(500).json({message:"Internal server error"});
+    }
+})
 
 app.get("/api/dataCount",async(req,res)=>{
     try{
@@ -91,6 +159,6 @@ app.get("/api/viewStore", async(req,res)=>{
     }
 });
 
-app.listen(port,()=>{
-    console.log(`Server is running on port ${port}`);
+app.listen(process.env.PORT,()=>{
+    console.log(`Server is running on port ${process.env.PORT}`);
 });
