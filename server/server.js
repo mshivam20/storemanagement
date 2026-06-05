@@ -175,13 +175,7 @@ app.get("/api/viewStore", async(req,res)=>{
         res.status(500).json({error:"Failed to fetch stores"});
     }
 });
-app.get(
-  "/api/admin",
-  verifyToken,
-  (req, res) => {
-    res.json(products);
-  }
-);
+
 
 app.get("/api/getStores", verifyToken, async (req, res) => {
   const userId = req.user.id;
