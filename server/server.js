@@ -21,7 +21,8 @@ const db= new pg.Client({
    password: process.env.DB_PASSWORD,
    port: process.env.DB_PORT
 });
-const saltRound=process.env.SALTROUND;
+const saltRounds = parseInt(process.env.SALTROUNDS)
+console.log(saltRounds)
 
 db.connect();
 app.post("/api/signup", async(req,res)=>{
@@ -33,7 +34,7 @@ app.post("/api/signup", async(req,res)=>{
             return res.status(400).json({message:"Email already exists"});
 
         }else{
-            bcrypt.hash(password, saltRound, async(err, hash)=>{
+            bcrypt.hash(password, saltRounds, async(err, hash)=>{
                 if(err){
                     console.error("Error hashing password:", err);
                     return res.status(500).json({message:"Internal server error"});
@@ -144,7 +145,10 @@ app.post("/api/addUser",async(req,res)=>{
 
 app.get("/api/viewUsers", async(req,res)=>{
     try{
-        const result=await db.query("SELECT *FROM users");
+        const result=await db.query(`SELECT users.user_id,users.name,users.email, users.address, users.role, store.overall_rating
+FROM users
+LEFT JOIN store
+ON users.user_id=store.owner_id`);
         const users=result.rows;
         res.status(200).json(users);
     }catch(error){

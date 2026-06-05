@@ -15,52 +15,88 @@ export default function Signup() {
 
   const [error, setError] = useState("");
 
-  const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
+  const validateForm = () => {
+  // Name: 20-60 characters
+  if (
+    formData.name.trim().length < 20 ||
+    formData.name.trim().length > 60
+  ) {
+    return "Name must be between 20 and 60 characters.";
+  }
+
+  // Email
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!emailRegex.test(formData.email)) {
+    return "Please enter a valid email address.";
+  }
+
+  // Password
+  const passwordRegex =
+    /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,16}$/;
+
+  if (!passwordRegex.test(formData.password)) {
+    return "Password must be 8-16 characters long and contain at least one uppercase letter and one special character.";
+  }
+
+  // Confirm Password
+  if (formData.password !== formData.confirmPassword) {
+    return "Passwords do not match.";
+  }
+
+  // Address
+  if (formData.address.trim().length > 400) {
+    return "Address cannot exceed 400 characters.";
+  }
+
+  return null;
+};
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (formData.password !== formData.confirmPassword) {
-      return setError("Passwords do not match");
+  const validationError = validateForm();
+
+  if (validationError) {
+    setError(validationError);
+    return;
+  }
+
+  setError("");
+
+  try {
+    const response = await fetch("/api/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        address: formData.address,
+        role: formData.role,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert("Account created successfully");
+      navigate("/login");
+    } else {
+      setError(data.message);
     }
-
-    setError("");
-
-    try {
-      const response = await fetch(
-        "/api/signup",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: formData.name,
-            email: formData.email,
-            password: formData.password,
-            address: formData.address,
-            role: formData.role,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (response.ok) {
-        alert("Account created successfully");
-        navigate("/login");
-      } else {
-        setError(data.message);
-      }
-    } catch (err) {
-      setError("Something went wrong");
-    }
-  };
+  } catch (err) {
+    setError("Something went wrong");
+  }
+};
+const handleChange = (e) => {
+  setFormData((prev) => ({
+    ...prev,
+    [e.target.name]: e.target.value,
+  }));
+};
 
   return (
     <div className="min-h-screen bg-slate-100 flex items-center justify-center px-4">
@@ -90,14 +126,19 @@ export default function Signup() {
                 </label>
 
                 <input
-                  type="text"
-                  name="name"
-                  placeholder="John Doe"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  className="w-full border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-slate-800"
-                />
+  type="text"
+  name="name"
+  placeholder="Jon Snow"
+  value={formData.name}
+  onChange={handleChange}
+  minLength={20}
+  maxLength={60}
+  className="w-full border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-slate-800"
+  required
+/>
+<p className="text-xs text-gray-500  mt-1">
+  20-60 characters
+</p>
               </div>
 
               <div>
@@ -121,15 +162,20 @@ export default function Signup() {
                   Password
                 </label>
 
+              
                 <input
-                  type="password"
-                  name="password"
-                  placeholder="********"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                  className="w-full border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-slate-800"
-                />
+  type="password"
+  name="password"
+  placeholder="********"
+  value={formData.password}
+  onChange={handleChange}
+  required
+  minLength={8}
+  maxLength={16}
+  pattern="^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?:{}|<>]).{8,16}$"
+  title="Password must contain 8-16 characters, one uppercase letter and one special character"
+  className="w-full border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-slate-800"
+/>
               </div>
 
               <div>
@@ -152,14 +198,18 @@ export default function Signup() {
                   Address
                 </label>
                 <input
-                  type="text"
-                  name="address"
-                  placeholder="Fc road Pune"
-                  value={formData.address}
-                  onChange={handleChange}
-                  required
-                  className="w-full border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-slate-800"
-                />
+  type="text"
+  name="address"
+  placeholder="Fc Road Pune"
+  value={formData.address}
+  onChange={handleChange}
+  maxLength={400}
+  className="w-full border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-slate-800"
+  required
+/>
+<p className="text-xs text-gray-500 mt-1 ">
+  Maximum 400 characters
+</p>
               </div>
               
 
