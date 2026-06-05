@@ -25,6 +25,8 @@ const saltRounds = parseInt(process.env.SALTROUNDS)
 console.log(saltRounds)
 
 db.connect();
+
+//sign up 
 app.post("/api/signup", async(req,res)=>{
     const {name, email, password, address, role} = req.body;
     
@@ -51,6 +53,7 @@ app.post("/api/signup", async(req,res)=>{
     }
 })
 
+//for login
 app.post ("/api/login", async (req,res)=>{
     const {email, password} = req.body;
     console.log(email, password);
@@ -93,6 +96,7 @@ app.post ("/api/login", async (req,res)=>{
     }
 })
 
+// for count no of stores, users and ratings
 app.get("/api/dataCount",async(req,res)=>{
     try{
         const totalStores=await db.query("SELECT COUNT(*) FROM store");
@@ -105,6 +109,7 @@ app.get("/api/dataCount",async(req,res)=>{
         res.status(500).json({error:"Failed to fetch data count"});
     }
 })
+//for getting store owners who don't own any store so can admin assign owner while creating store
 app.get("/api/storeOwners", async(req,res)=>{
     try{
         const result = await db.query("SELECT user_id, name FROM users WHERE role='store_owner' AND user_id NOT IN(SELECT owner_id FROM store);");
@@ -118,7 +123,7 @@ app.get("/api/storeOwners", async(req,res)=>{
         res.status(500).json({error:"Failed to fetch store owners"});
     }
 })
-
+// for creating new store
 app.post("/api/addStore", async(req,res)=>{
     const {storeName, storeLocation, storeOwner} = req.body;
     console.log(storeName, storeLocation, storeOwner);
@@ -131,6 +136,7 @@ app.post("/api/addStore", async(req,res)=>{
     }
 })
 
+//for creating new user
 app.post("/api/addUser",async(req,res)=>{
     const {userName, userEmail, userPassword, userRole, address} = req.body;
     console.log(userName, userEmail, userPassword, userRole, address);
@@ -143,6 +149,7 @@ app.post("/api/addUser",async(req,res)=>{
     }
 })
 
+//for getting user list on admin dashboard
 app.get("/api/viewUsers", async(req,res)=>{
     try{
         const result=await db.query(`SELECT users.user_id,users.name,users.email, users.address, users.role, store.overall_rating
@@ -157,6 +164,7 @@ ON users.user_id=store.owner_id`);
     }
 });
 
+//for getting all stores on admin dashboard
 app.get("/api/viewStore", async(req,res)=>{
     try{
         const result =await db.query("SELECT * FROM store");
@@ -167,13 +175,13 @@ app.get("/api/viewStore", async(req,res)=>{
         res.status(500).json({error:"Failed to fetch stores"});
     }
 });
-// app.get(
-//   "/api/admin",
-//   verifyToken,
-//   (req, res) => {
-//     res.json(products);
-//   }
-// );
+app.get(
+  "/api/admin",
+  verifyToken,
+  (req, res) => {
+    res.json(products);
+  }
+);
 
 app.get("/api/getStores", verifyToken, async (req, res) => {
   const userId = req.user.id;
@@ -187,7 +195,7 @@ app.get("/api/getStores", verifyToken, async (req, res) => {
       s.store_name,
       s.address,
 
-      COALESCE(AVG(r.rating),0) AS overall_rating,
+      COALESCE(AVG(r.rating),0) AS avg_rating,
 
       (
         SELECT rating
@@ -208,6 +216,8 @@ app.get("/api/getStores", verifyToken, async (req, res) => {
 
   res.json(result.rows);
 });
+
+// for rating and updating rating of store
 app.post(
   "/api/userRating/:id/rating",
   verifyToken,
@@ -244,11 +254,14 @@ app.post(
     }
   }
 );
+
+// for getting store info at owner dashboard
 app.get("/api/store-owner/dashboard",verifyToken, async(req,res)=>{
     const user_id= req.user.id;
     console.log(user_id);
     try{
-        const storeData= await db.query(`SELECT store.store_id, store.store_name,store.address,store.overall_rating,users.name
+        
+        const storeData= await db.query(`SELECT store.store_id, store.store_name,store.address,users.name
 FROM store
 JOIN users
 ON store.owner_id= users.user_id
@@ -264,11 +277,15 @@ ON users.user_id= ratings.user_id
 WHERE store_id=$1
 `,[storeData.rows[0].store_id]);
 
+const overall_rating=await db.query("SELECT AVG(rating) FROM ratings WHERE store_id=$1",[storeData.rows[0].store_id])
+
+console.log(overall_rating.rows)
 console.log(storeData.rows);
 console.log(ratingsHistory.rows)
 res.status(200).json({
   storeData: storeData.rows,
   ratingsHistory: ratingsHistory.rows,
+  overall_rating: overall_rating.rows,
 });
 
     }catch(error){
@@ -278,7 +295,7 @@ res.status(200).json({
       });
     }
 })
-
+//for change password
 app.put("/api/changePassword", async (req, res) => {
   try {
     console.log("ROUTE HIT");

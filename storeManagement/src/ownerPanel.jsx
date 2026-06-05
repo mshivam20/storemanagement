@@ -27,12 +27,14 @@ export default function OwnerPanel() {
 
       const data = await response.json();
       console.log(data);
+     
 
-      setAvgRating(data.storeData[0].overall_rating);
+     setAvgRating(Math.round(Number(data.overall_rating[0].avg) * 10) / 10);
       setRatings(data.ratingsHistory);
       setStoreName(data.storeData[0].store_name);
       setAddress(data.storeData[0].address);
       setOwnerName(data.storeData[0].name);
+      
     } catch (error) {
       console.log(error);
     }
