@@ -218,3 +218,185 @@ Ratings Submitted:
 Average Rating:
 
 4.25
+
+# 🛠️ Tech Stack
+
+The Store Rating Management System is built using a modern full-stack technology stack.
+
+## 🎨 Frontend
+
+### ⚛️ React.js
+Used to build the interactive and component-based user interface.
+
+### 🎨 Tailwind CSS
+Used for styling the application and creating a responsive user interface.
+
+### JavaScript
+Used for implementing frontend functionality, API communication, state management, and user interactions.
+
+---
+
+## ⚙️ Backend
+
+### 🟢 Node.js
+Used as the JavaScript runtime environment for the backend.
+
+### 🚂 Express.js
+Used to build the backend server and RESTful APIs.
+
+Express.js handles:
+
+- API routing
+- Authentication
+- Authorization
+- User management
+- Store management
+- Rating management
+- Request and response handling
+
+---
+
+## 🗄️ Database
+
+### 🐘 PostgreSQL
+PostgreSQL is used as the relational database for storing and managing application data.
+
+The database stores information related to:
+
+- Users
+- Stores
+- Store Owners
+- Ratings
+- User-Store relationships
+
+---
+
+## 🔐 Authentication & Security
+
+### 🔑 JWT (JSON Web Token)
+JWT is used for authentication and maintaining secure user sessions.
+
+It is also used to identify the logged-in user's role and provide access to protected resources.
+
+### 🔒 bcrypt
+bcrypt is used to securely hash user passwords before storing them in the database.
+
+---
+
+## 📦 Technology Summary
+
+| Category | Technology | Purpose |
+|---|---|---|
+| Frontend | React.js | Building the user interface |
+| Styling | Tailwind CSS | UI styling and responsive design |
+| Programming Language | JavaScript | Application logic |
+| Runtime | Node.js | Backend runtime environment |
+| Backend | Express.js | REST API and server |
+| Database | PostgreSQL | Data storage and management |
+| Authentication | JWT | User authentication and authorization |
+| Security | bcrypt | Password hashing |
+
+---
+
+## 🏗️ Technology Architecture
+
+```text
+┌─────────────────────────────────────┐
+│             FRONTEND                │
+│                                     │
+│        React.js + JavaScript        │
+│            Tailwind CSS             │
+└──────────────────┬──────────────────┘
+                   │
+                   │ REST API
+                   ▼
+┌─────────────────────────────────────┐
+│              BACKEND                │
+│                                     │
+│          Node.js + Express.js       │
+│                                     │
+│      ┌────────────────────────┐     │
+│      │ JWT Authentication      │     │
+│      └────────────────────────┘     │
+│                                     │
+│      ┌────────────────────────┐     │
+│      │ Role-Based Access       │     │
+│      │ Control                 │     │
+│      └────────────────────────┘     │
+│                                     │
+│      ┌────────────────────────┐     │
+│      │ bcrypt Password Hashing│     │
+│      └────────────────────────┘     │
+└──────────────────┬──────────────────┘
+                   │
+                   │ SQL Queries
+                   ▼
+┌─────────────────────────────────────┐
+│             DATABASE                │
+│                                     │
+│             PostgreSQL              │
+│                                     │
+│     Users | Stores | Ratings        │
+└─────────────────────────────────────┘
+
+# 🔑 Role-Based Access Control
+
+The application implements **Role-Based Access Control (RBAC)** to ensure that users can access only the features permitted for their assigned role.
+
+The system supports three roles:
+
+- 👨‍💼 **System Administrator**
+- 👤 **Normal User**
+- 🏪 **Store Owner**
+
+| Feature | Administrator | Normal User | Store Owner |
+|---|:---:|:---:|:---:|
+| Login | ✅ | ✅ | ✅ |
+| Registration | ❌ | ✅ | ❌ |
+| Add Store | ✅ | ❌ | ❌ |
+| Add Normal User | ✅ | ❌ | ❌ |
+| Add Admin User | ✅ | ❌ | ❌ |
+| View All Users | ✅ | ❌ | ❌ |
+| View All Stores | ✅ | ✅ | ❌ |
+| Search Users | ✅ | ❌ | ❌ |
+| Search Stores | ✅ | ✅ | ❌ |
+| Filter Users | ✅ | ❌ | ❌ |
+| Sort Users | ✅ | ❌ | ❌ |
+| Sort Stores | ✅ | ✅ | ❌ |
+| Submit Rating | ❌ | ✅ | ❌ |
+| Modify Rating | ❌ | ✅ | ❌ |
+| View Submitted Ratings | ✅ | ✅ | ✅ |
+| View Average Rating | ✅ | ✅ | ✅ |
+| View Rated Users | ❌ | ❌ | ✅ |
+| Update Password | ✅ | ✅ | ✅ |
+| Logout | ✅ | ✅ | ✅ |
+
+### 🔐 RBAC Flow
+
+```text
+                         ┌───────────────┐
+                         │     Login     │
+                         └───────┬───────┘
+                                 │
+                                 ▼
+                         ┌───────────────┐
+                         │ Authenticate  │
+                         │   with JWT    │
+                         └───────┬───────┘
+                                 │
+                                 ▼
+                         ┌───────────────┐
+                         │ Get User Role │
+                         └───────┬───────┘
+                                 │
+                ┌────────────────┼────────────────┐
+                │                │                │
+                ▼                ▼                ▼
+        ┌──────────────┐ ┌──────────────┐ ┌──────────────┐
+        │    ADMIN     │ │ NORMAL USER  │ │ STORE OWNER  │
+        └──────┬───────┘ └──────┬───────┘ └──────┬───────┘
+               │                │                │
+               ▼                ▼                ▼
+        Manage Users       View Stores      View Store
+        Manage Stores      Submit Rating    Ratings
+        View Dashboard     Modify Rating   Average Rating
