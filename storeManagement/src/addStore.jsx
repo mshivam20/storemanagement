@@ -16,7 +16,9 @@ function AddStore(){
         }
         fetchStoreOwners();
     }, []);
+
     const navigate = useNavigate();
+    
    const addStore = async () =>{
          const response =await fetch("/api/addStore",{
             method:"POST",
