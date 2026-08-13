@@ -488,28 +488,6 @@ node_modules/
 
 ---
 
-# 🗃️ Database Setup
-
-1. Install PostgreSQL.
-2. Create a new database.
-3. Configure the database connection in `.env`.
-4. Create the required tables.
-5. Run the backend server.
-
-Example:
-
-```sql
-CREATE DATABASE store_rating_system;
-```
-
-Then configure the connection:
-
-```env
-DATABASE_URL=postgresql://username:password@localhost:5432/store_rating_system
-```
-
----
-
 # ▶️ Running the Application
 
 ## Start Backend
