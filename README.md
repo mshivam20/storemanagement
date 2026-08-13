@@ -411,58 +411,24 @@ updated_at
 # 🖼️ Screenshots
 
 Add screenshots of the application below.
-
-## Login Page
-
-
-
----
-
-## Registration Page
-
-
-
 ---
 
 ## Administrator Dashboard
 
-
-
----
-
-## Store Management
-
-
+![Administrator Dashboard](./screenshots/admin.png)
 
 ---
+
 
 ## User Management
 
+![User Management](./screenshots/user.png)
 
 
 ---
-
-## Store Listing
-
-
-
----
-
-## Rating Submission
-
-
-
----
-
 ## Store Owner Dashboard
 
-
-
----
-
-## Responsive Design
-
-
+![Store Owner Dashboard](./screenshots/storeowner.png)
 
 ---
 
