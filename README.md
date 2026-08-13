@@ -207,7 +207,7 @@ Ratings are submitted on a scale from **1 to 5**.
 
 ### Example
 
-```text
+text
 Ratings Submitted:
 
 5
@@ -300,7 +300,7 @@ bcrypt is used to securely hash user passwords before storing them in the databa
 
 ## 🏗️ Technology Architecture
 
-```text
+
 ┌─────────────────────────────────────┐
 │             FRONTEND                │
 │                                     │
@@ -339,64 +339,3 @@ bcrypt is used to securely hash user passwords before storing them in the databa
 │     Users | Stores | Ratings        │
 └─────────────────────────────────────┘
 
-# 🔑 Role-Based Access Control
-
-The application implements **Role-Based Access Control (RBAC)** to ensure that users can access only the features permitted for their assigned role.
-
-The system supports three roles:
-
-- 👨‍💼 **System Administrator**
-- 👤 **Normal User**
-- 🏪 **Store Owner**
-
-| Feature | Administrator | Normal User | Store Owner |
-|---|:---:|:---:|:---:|
-| Login | ✅ | ✅ | ✅ |
-| Registration | ❌ | ✅ | ❌ |
-| Add Store | ✅ | ❌ | ❌ |
-| Add Normal User | ✅ | ❌ | ❌ |
-| Add Admin User | ✅ | ❌ | ❌ |
-| View All Users | ✅ | ❌ | ❌ |
-| View All Stores | ✅ | ✅ | ❌ |
-| Search Users | ✅ | ❌ | ❌ |
-| Search Stores | ✅ | ✅ | ❌ |
-| Filter Users | ✅ | ❌ | ❌ |
-| Sort Users | ✅ | ❌ | ❌ |
-| Sort Stores | ✅ | ✅ | ❌ |
-| Submit Rating | ❌ | ✅ | ❌ |
-| Modify Rating | ❌ | ✅ | ❌ |
-| View Submitted Ratings | ✅ | ✅ | ✅ |
-| View Average Rating | ✅ | ✅ | ✅ |
-| View Rated Users | ❌ | ❌ | ✅ |
-| Update Password | ✅ | ✅ | ✅ |
-| Logout | ✅ | ✅ | ✅ |
-
-### 🔐 RBAC Flow
-
-```text
-                         ┌───────────────┐
-                         │     Login     │
-                         └───────┬───────┘
-                                 │
-                                 ▼
-                         ┌───────────────┐
-                         │ Authenticate  │
-                         │   with JWT    │
-                         └───────┬───────┘
-                                 │
-                                 ▼
-                         ┌───────────────┐
-                         │ Get User Role │
-                         └───────┬───────┘
-                                 │
-                ┌────────────────┼────────────────┐
-                │                │                │
-                ▼                ▼                ▼
-        ┌──────────────┐ ┌──────────────┐ ┌──────────────┐
-        │    ADMIN     │ │ NORMAL USER  │ │ STORE OWNER  │
-        └──────┬───────┘ └──────┬───────┘ └──────┬───────┘
-               │                │                │
-               ▼                ▼                ▼
-        Manage Users       View Stores      View Store
-        Manage Stores      Submit Rating    Ratings
-        View Dashboard     Modify Rating   Average Rating
