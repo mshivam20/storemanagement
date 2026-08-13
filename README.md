@@ -437,9 +437,9 @@ Add screenshots of the application below.
 ## 1. Clone the Repository
 
 ```bash
-git clone <YOUR_GITHUB_REPOSITORY_URL>
+git clone https://github.com/mshivam20/storemanagement.git
 
-cd store-rating-management-system
+cd /e/coding challenge/storemanagement/storemanagement
 ```
 
 ---
